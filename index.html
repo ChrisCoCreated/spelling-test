@@ -122,7 +122,10 @@
 
             function saveWordSets(wordSets) {
                 localStorage.setItem("wordSets", JSON.stringify(wordSets));
-                console.log("Saved word sets:", wordSets);
+                
+                // Log all word sets with "learning" in their names
+                const learningWordSets = Object.keys(wordSets).filter(setName => setName.toLowerCase().includes("learning"));
+                console.log("Learning word sets:", learningWordSets);
             }
 
             function speakWord(word) {
