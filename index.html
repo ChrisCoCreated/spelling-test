@@ -177,7 +177,15 @@
 
             function addWordToLearningList(word) {
                 const wordSets = getWordSets();
-                const learningListName = "Learning Words";
+                let learningListName = "Learning Words";
+                let listIndex = 1;
+
+                // Find the next available learning list
+                while (wordSets[`${learningListName} ${listIndex}`] && wordSets[`${learningListName} ${listIndex}`].length >= 10) {
+                    listIndex++;
+                }
+
+                learningListName = `${learningListName} ${listIndex}`;
 
                 if (!wordSets[learningListName]) {
                     wordSets[learningListName] = [];
@@ -185,9 +193,6 @@
                 }
 
                 if (!wordSets[learningListName].includes(word)) {
-                    if (wordSets[learningListName].length >= 10) {
-                        wordSets[learningListName].shift(); // Remove the oldest word if the list exceeds 10
-                    }
                     wordSets[learningListName].push(word);
                     console.log(`Added word "${word}" to ${learningListName}`);
                     saveWordSets(wordSets);
@@ -207,16 +212,17 @@
                         correctWords.push(currentWords[currentIndex]);
                         correctFirstAttempt++;
                         scoreCount.textContent = correctFirstAttempt;
-                    }
 
-                    if (isDynamicSet) {
-                        const dynamicList = getWordSets()["Dynamic List"];
-                        const index = dynamicList.indexOf(currentWords[currentIndex]);
-                        if (index !== -1) {
-                            dynamicList.splice(index, 1);
-                            const wordSets = getWordSets();
-                            wordSets["Dynamic List"] = dynamicList;
-                            saveWordSets(wordSets);
+                        // Remove from Dynamic List if correct on first attempt
+                        if (isDynamicSet) {
+                            const dynamicList = getWordSets()["Dynamic List"];
+                            const index = dynamicList.indexOf(currentWords[currentIndex]);
+                            if (index !== -1) {
+                                dynamicList.splice(index, 1);
+                                const wordSets = getWordSets();
+                                wordSets["Dynamic List"] = dynamicList;
+                                saveWordSets(wordSets);
+                            }
                         }
                     }
 
