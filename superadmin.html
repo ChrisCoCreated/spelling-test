@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superadmin - Delete All Word Sets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            background-color: red;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <h1>Superadmin - Manage Word Sets</h1>
+    <p>Use this page to delete all word sets stored in the application.</p>
+    <button id="deleteAllBtn">Delete All Word Sets</button>
+    <button onclick="location.href='index.html'">Back to Test</button>
+    <button onclick="location.href='admin.html'">Admin Page</button>
+
+    <script>
+        const deleteAllBtn = document.getElementById("deleteAllBtn");
+
+        deleteAllBtn.addEventListener("click", () => {
+            if (confirm("Are you sure you want to delete all word sets? This action cannot be undone.")) {
+                localStorage.removeItem("wordSets"); // Remove all word sets from localStorage
+                alert("All word sets have been deleted.");
+                location.reload(); // Reload the page to update the UI
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Manage Word Sets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #wordSetSelect, #wordList {
+            margin-bottom: 20px;
+            width: 300px;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        input[type="text"], textarea {
+            width: 200px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin - Manage Word Sets</h1>
+    <label for="wordSetSelect">Select Word Set:</label>
+    <select id="wordSetSelect"></select>
+
+    <ul id="wordList"></ul>
+<button id="copyWordListBtn">Copy Word List</button>
+    <h3>Add New Words</h3>
+    <textarea id="newWordInput" rows="4" placeholder="Enter words separated by space, comma, or new line"></textarea>
+    <button id="addWordBtn">Add Words</button>
+
+    <h3>Edit or Delete Selected Word</h3>
+    <input type="text" id="editWordInput" placeholder="Edit selected word" />
+    <button id="saveEditBtn">Save Edit</button>
+    <button id="deleteWordBtn">Delete Word</button>
+
+    <h3>Add New Set</h3>
+    <input type="text" id="newSetInput" placeholder="Enter new set name" />
+    <button id="addSetBtn">Add Set</button>
+
+    <h3>Delete Selected Set</h3>
+    <button id="deleteSetBtn">Delete Selected Set</button>
+
+    <button onclick="location.href='index.html'">Back to Test</button>
+
+    <script>
+        const wordSetSelect = document.getElementById("wordSetSelect");
+        const wordList = document.getElementById("wordList");
+        const newWordInput = document.getElementById("newWordInput");
+        const addWordBtn = document.getElementById("addWordBtn");
+        const editWordInput = document.getElementById("editWordInput");
+        const saveEditBtn = document.getElementById("saveEditBtn");
+        const deleteWordBtn = document.getElementById("deleteWordBtn");
+        const newSetInput = document.getElementById("newSetInput");
+        const addSetBtn = document.getElementById("addSetBtn");
+        const deleteSetBtn = document.getElementById("deleteSetBtn");
+
+        let selectedSet = null;
+        let selectedWord = null;
+        let wordSets = getWordSets();
+
+        function getWordSets() {
+            const wordSets = JSON.parse(localStorage.getItem("wordSets")) || {};
+
+            // Initialize "Dynamic List" if it doesn't exist
+            if (!wordSets["Dynamic List"]) {
+                wordSets["Dynamic List"] = [];
+                saveWordSets(wordSets);
+            }
+            return wordSets;
+        }
+
+        function saveWordSets(wordSets) {
+            localStorage.setItem("wordSets", JSON.stringify(wordSets));
+        }
+
+        function renderWordSets() {
+            // Clear existing options
+            wordSetSelect.innerHTML = "";
+
+            // Populate dropdown with word sets from localStorage
+            for (const setName in wordSets) {
+                const option = document.createElement("option");
+                option.value = setName;
+                option.textContent = setName;
+                wordSetSelect.appendChild(option);
+            }
+
+            // Set the first option as selected
+            if (wordSetSelect.options.length > 0) {
+                wordSetSelect.value = wordSetSelect.options[0].value;
+                selectedSet = wordSetSelect.value;
+                renderWordList();
+            } else {
+                wordList.innerHTML = ""; // Clear the word list if no sets exist
+                selectedSet = null;
+            }
+        }
+
+        function renderWordList() {
+            if (!selectedSet || !wordSets[selectedSet]) {
+                wordList.innerHTML = ""; // Clear if no set is selected
+                return;
+            }
+
+            wordList.innerHTML = "";
+            wordSets[selectedSet].forEach((word, index) => {
+                const li = document.createElement("li");
+                li.textContent = word;
+                li.style.cursor = "pointer";
+                li.dataset.index = index;
+                li.addEventListener("click", () => selectWord(index));
+                wordList.appendChild(li);
+            });
+        }
+
+        function selectWord(index) {
+            selectedWord = index;
+            editWordInput.value = wordSets[selectedSet][index];
+            Array.from(wordList.children).forEach(li => li.style.backgroundColor = "");
+            wordList.children[index].style.backgroundColor = "#ddd";
+        }
+
+        // Event listeners
+        wordSetSelect.addEventListener("change", () => {
+            selectedSet = wordSetSelect.value;
+            selectedWord = null;
+            editWordInput.value = "";
+            renderWordList();
+        });
+
+        addWordBtn.addEventListener("click", () => {
+            const inputText = newWordInput.value.trim();
+            if (inputText && selectedSet) {
+                // Split the input by space, comma, or new line
+                const newWords = inputText.split(/[\s,]+/).filter(word => word.trim() !== "");
+
+                if (newWords.length > 0) {
+                    wordSets[selectedSet] = [...wordSets[selectedSet], ...newWords];
+                    saveWordSets(wordSets);
+                    newWordInput.value = "";
+                    renderWordList();
+                }
+            }
+        });
+
+        saveEditBtn.addEventListener("click", () => {
+            if (selectedWord !== null) {
+                const editedWord = editWordInput.value.trim();
+                if (editedWord) {
+                    wordSets[selectedSet][selectedWord] = editedWord;
+                    saveWordSets(wordSets);
+                    renderWordList();
+                }
+            }
+        });
+
+        deleteWordBtn.addEventListener("click", () => {
+            if (selectedWord !== null) {
+                wordSets[selectedSet].splice(selectedWord, 1);
+                saveWordSets(wordSets);
+                selectedWord = null;
+                editWordInput.value = "";
+                renderWordList();
+            }
+        });
+
+        addSetBtn.addEventListener("click", () => {
+            const newSetName = newSetInput.value.trim();
+            if (newSetName && !wordSets[newSetName]) {
+                wordSets[newSetName] = [];
+                saveWordSets(wordSets);
+                newSetInput.value = "";
+
+                // Render the word sets again to include the new set and select it
+                renderWordSets();
+                wordSetSelect.value = newSetName;
+                selectedSet = newSetName;
+                renderWordList();
+            } else if (wordSets[newSetName]) {
+                alert("Set name already exists.");
+            }
+        });
+
+        deleteSetBtn.addEventListener("click", () => {
+            if (selectedSet && selectedSet !== "Dynamic List" && confirm(`Are you sure you want to delete the set "${selectedSet}"?`)) {
+                delete wordSets[selectedSet];
+                saveWordSets(wordSets);
+                renderWordSets();
+            } else if (selectedSet === "Dynamic List") {
+                alert("The Dynamic List cannot be deleted.");
+            }
+        });
+
+const copyWordListBtn = document.getElementById("copyWordListBtn");
+
+copyWordListBtn.addEventListener("click", () => {
+    if (selectedSet && wordSets[selectedSet].length > 0) {
+        // Convert the word list to a comma-separated string
+        const wordListString = wordSets[selectedSet].join(", ");
+        
+        // Copy the string to the clipboard
+        navigator.clipboard.writeText(wordListString).then(() => {
+            alert(`Word list for "${selectedSet}" copied to clipboard.`);
+        }).catch(err => {
+            console.error("Error copying text to clipboard: ", err);
+            alert("Failed to copy the word list. Please try again.");
+        });
+    } else {
+        alert("No words in the selected set to copy.");
+    }
+});
+
+        // Initialize the admin page
+        renderWordSets();
+    </script>
+</body>
+</html>

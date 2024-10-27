@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        #wordInput {
+            margin: 10px 0;
+            padding: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+        }
+        #result {
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        #hint {
+            font-style: italic;
+            margin-top: 10px;
+        }
+        #summary {
+            margin-top: 20px;
+            display: none;
+        }
+        #score {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #adminLink {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Spelling Test</h1>
+    <i id="testName"></i>
+    <div id="wordSetSelection">
+        <p>Choose a set of words:</p>
+    </div>
+    <div id="testContainer" style="display: none;">
+        <p>Type the word you hear:</p>
+        <input type="text" id="wordInput" placeholder="Enter the word here" autocomplete="off"/>
+        <div>
+            <button id="submitBtn">Submit</button>
+            <button id="replayBtn">Replay Word</button>
+            <button id="nextBtn" style="display: none;">Next Word</button>
+        </div>
+        <p id="result"></p>
+        <p id="hint"></p>
+        <p id="score">Correct on first attempt: <span id="scoreCount">0</span></p>
+    </div>
+    <div id="summary">
+        <h2>Test Summary</h2>
+        <p><strong>Correct Words (First Attempt):</strong></p>
+        <ul id="correctList"></ul>
+        <p><strong>Words to Revisit:</strong></p>
+        <ul id="revisitList"></ul>
+        <p><strong>Total Correct on First Attempt:</strong> <span id="firstAttemptCount"></span></p>
+        <button id="restartBtn">Restart with Original Words</button>
+        <button id="revisitBtn" style="display: none;">New Test with Revisit Words</button>
+    </div>
+    <a href="admin.html" id="adminLink">Admin Page</a>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const wordSetSelection = document.getElementById("wordSetSelection");
+            const wordInput = document.getElementById("wordInput");
+            const submitBtn = document.getElementById("submitBtn");
+            const replayBtn = document.getElementById("replayBtn");
+            const nextBtn = document.getElementById("nextBtn");
+            const result = document.getElementById("result");
+            const hint = document.getElementById("hint");
+            const summary = document.getElementById("summary");
+            const correctList = document.getElementById("correctList");
+            const revisitList = document.getElementById("revisitList");
+            const firstAttemptCount = document.getElementById("firstAttemptCount");
+            const scoreCount = document.getElementById("scoreCount");
+            const restartBtn = document.getElementById("restartBtn");
+            const revisitBtn = document.getElementById("revisitBtn");
+
+            let currentWords = [];
+            let originalWords = [];
+            let currentIndex = 0;
+            let hintIndex = 0;
+            let wordChecked = false;
+            const correctWords = [];
+            let revisitWords = [];
+            let correctFirstAttempt = 0;
+            let isDynamicSet = false;
+
+            function getWordSets() {
+                const wordSets = JSON.parse(localStorage.getItem("wordSets")) || {};
+
+                // Initialize "Dynamic List" if it doesn't exist
+                if (!wordSets["Dynamic List"]) {
+                    wordSets["Dynamic List"] = [];
+                    saveWordSets(wordSets);
+                }
+                return wordSets;
+            }
+
+            function saveWordSets(wordSets) {
+                localStorage.setItem("wordSets", JSON.stringify(wordSets));
+            }
+
+            function speakWord(word) {
+                const speech = new SpeechSynthesisUtterance(word);
+                speech.lang = "en-US";
+                window.speechSynthesis.speak(speech);
+            }
+
+            function renderWordSetButtons() {
+                wordSetSelection.innerHTML = ""; // Clear existing buttons
+                const wordSets = getWordSets();
+
+                // Dynamically create buttons for each word set
+                for (const setName in wordSets) {
+                    const button = document.createElement("button");
+                    button.className = "wordSetBtn";
+                    button.textContent = setName;
+                    button.dataset.set = setName;
+                    button.addEventListener("click", () => selectWordSet(setName));
+                    wordSetSelection.appendChild(button);
+                }
+            }
+
+            function selectWordSet(setName) {
+                const wordSets = getWordSets();
+                currentWords = wordSets[setName] || [];
+                originalWords = [...currentWords];
+                isDynamicSet = setName === "Dynamic List";
+		    document.getElementById("testName").textContent = `${setName}`;
+                startTest();
+            }
+
+            function startTest() {
+                wordSetSelection.style.display = "none";
+                document.getElementById("testContainer").style.display = "block";
+                summary.style.display = "none";
+                hintIndex = 0;
+                hint.textContent = "";
+                speakWord(currentWords[currentIndex]);
+            }
+
+function checkWord() {
+    const userInput = wordInput.value.trim();
+    if (userInput === currentWords[currentIndex]) {
+        result.textContent = "Correct!";
+        result.style.color = "green";
+        hint.textContent = "";
+        if (!revisitWords.includes(currentWords[currentIndex])) {
+            correctWords.push(currentWords[currentIndex]);
+            correctFirstAttempt++;
+            scoreCount.textContent = correctFirstAttempt;
+        }
+
+        if (isDynamicSet) {
+            const dynamicList = getWordSets()["Dynamic List"];
+            const index = dynamicList.indexOf(currentWords[currentIndex]);
+            if (index !== -1) {
+                dynamicList.splice(index, 1);
+                const wordSets = getWordSets();
+                wordSets["Dynamic List"] = dynamicList;
+                saveWordSets(wordSets);
+            }
+        }
+
+        nextBtn.style.display = "inline-block";
+        submitBtn.style.display = "none";
+        replayBtn.style.display = "none";
+        wordChecked = true;
+    } else {
+        result.textContent = "Incorrect. Try again.";
+        result.style.color = "red";
+        if (!revisitWords.includes(currentWords[currentIndex])) {
+            revisitWords.push(currentWords[currentIndex]);
+        }
+
+        const wordSets = getWordSets();
+        wordSets["Dynamic List"].push(currentWords[currentIndex]);
+        saveWordSets(wordSets);
+
+        showHint();
+        wordChecked = false;
+    }
+}
+
+            function showHint() {
+                hintIndex = Math.min(hintIndex + 1, currentWords[currentIndex].length);
+                hint.textContent = `Hint: ${currentWords[currentIndex].substring(0, hintIndex)}${"_".repeat(currentWords[currentIndex].length - hintIndex)}`;
+            }
+
+            function nextWord() {
+                currentIndex++;
+                if (currentIndex < currentWords.length) {
+                    result.textContent = "";
+                    wordInput.value = "";
+                    nextBtn.style.display = "none";
+                    submitBtn.style.display = "inline-block";
+                    replayBtn.style.display = "inline-block";
+                    hintIndex = 0;
+                    hint.textContent = "";
+                    wordChecked = false;
+                    speakWord(currentWords[currentIndex]);
+                } else {
+                    showSummary();
+                }
+            }
+
+            function replayWord() {
+                speakWord(currentWords[currentIndex]);
+            }
+
+            function showSummary() {
+                document.getElementById("testContainer").style.display = "none";
+                summary.style.display = "block";
+                correctList.innerHTML = "";
+                revisitList.innerHTML = "";
+
+                correctWords.forEach(word => {
+                    const li = document.createElement("li");
+                    li.textContent = word;
+                    correctList.appendChild(li);
+                });
+
+                revisitWords.forEach(word => {
+                    const li = document.createElement("li");
+                    li.textContent = word;
+                    revisitList.appendChild(li);
+                });
+
+                firstAttemptCount.textContent = correctFirstAttempt;
+                revisitBtn.style.display = revisitWords.length
+                > 0 ? "inline-block" : "none";
+            }
+
+            function resetTest(useRevisitWords = false) {
+                currentIndex = 0;
+                correctWords.length = 0;
+                revisitWords = useRevisitWords ? [...revisitWords] : [];
+                correctFirstAttempt = 0;
+                scoreCount.textContent = correctFirstAttempt;
+                currentWords = useRevisitWords ? revisitWords : [...originalWords];
+                wordInput.value = "";
+                result.textContent = "";
+                hint.textContent = "";
+                wordChecked = false;
+                nextBtn.style.display = "none";
+                submitBtn.style.display = "inline-block";
+                replayBtn.style.display = "inline-block";
+                wordSetSelection.style.display = "none";
+                document.getElementById("testContainer").style.display = "block";
+                summary.style.display = "none";
+                hintIndex = 0;
+                speakWord(currentWords[currentIndex]);
+            }
+
+            wordInput.addEventListener("keydown", function(event) {
+                if (event.key === "Enter") {
+                    if (!wordChecked) {
+                        checkWord();
+                    } else {
+                        nextWord();
+                    }
+                }
+            });
+
+            submitBtn.addEventListener("click", () => {
+                checkWord();
+                if (wordChecked) {
+                    nextWord();
+                }
+            });
+
+            nextBtn.addEventListener("click", nextWord);
+            replayBtn.addEventListener("click", replayWord);
+            restartBtn.addEventListener("click", () => resetTest(false));
+            revisitBtn.addEventListener("click", () => resetTest(true));
+
+            // Initialize the page by rendering word set buttons
+            renderWordSetButtons();
+        });
+    </script>
+</body>
+</html>
