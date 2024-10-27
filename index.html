@@ -93,9 +93,10 @@
         <button id="backToListsBtn">Back to Word Lists</button>
     </div>
     <a href="admin.html" id="adminLink">Admin Page</a>
-    <div id="version">Version 1.0.4</div>
+    <div id="version">Version 1.0.5</div>
     <div id="languageSelection">
-        <button class="languageBtn" data-lang="en-US">English</button>
+        <button class="languageBtn" data-lang="en-US">English (US)</button>
+        <button class="languageBtn" data-lang="en-GB">English (UK)</button>
         <button class="languageBtn" data-lang="es-ES">Spanish</button>
         <button class="languageBtn" data-lang="fr-FR">French</button>
     </div>
@@ -125,7 +126,7 @@
             let revisitWords = [];
             let correctFirstAttempt = 0;
             let isDynamicSet = false;
-            let currentLanguage = "en-US"; // Default language
+            let currentLanguage = "en-GB"; // Default language
 
             function getWordSets() {
                 return JSON.parse(localStorage.getItem("wordSets")) || {};
