@@ -190,6 +190,7 @@
 
                 learningListName = `${learningListName} ${listIndex}`;
 
+                // Ensure the learning list is initialized
                 if (!wordSets[learningListName]) {
                     wordSets[learningListName] = [];
                     console.log(`Created new learning words list: ${learningListName}`);
@@ -241,6 +242,12 @@
                     }
 
                     const wordSets = getWordSets();
+                    
+                    // Ensure "Dynamic List" is initialized
+                    if (!wordSets["Dynamic List"]) {
+                        wordSets["Dynamic List"] = [];
+                    }
+                    
                     wordSets["Dynamic List"].push(currentWords[currentIndex]);
                     saveWordSets(wordSets);
 
