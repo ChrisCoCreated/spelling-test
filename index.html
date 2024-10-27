@@ -55,7 +55,7 @@
     </div>
     <div id="testContainer" style="display: none;">
         <p>Type the word you hear:</p>
-        <input type="text" id="wordInput" placeholder="Enter the word here" autocomplete="off"/>
+        <input type="text" id="wordInput" placeholder="Enter the word here" autocomplete="off" autocorrect="off"/>
         <div>
             <button id="submitBtn">Submit</button>
             <button id="replayBtn">Replay Word</button>
@@ -159,8 +159,9 @@
             }
 
 function checkWord() {
-    const userInput = wordInput.value.trim();
-    if (userInput === currentWords[currentIndex]) {
+    const userInput = wordInput.value.trim().toLowerCase(); // Convert user input to lowercase
+    const currentWord = currentWords[currentIndex].toLowerCase(); // Convert current word to lowercase
+    if (userInput === currentWord) {
         result.textContent = "Correct!";
         result.style.color = "green";
         hint.textContent = "";
