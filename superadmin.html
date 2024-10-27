@@ -26,6 +26,18 @@
         button:hover {
             background-color: darkred;
         }
+        #populateWordSetsBtn {
+            background-color: blue;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            border: none;
+        }
+        #populateWordSetsBtn:hover {
+            background-color: darkblue;
+        }
     </style>
 </head>
 <body>
@@ -50,29 +62,7 @@
         const populateWordSetsBtn = document.getElementById("populateWordSetsBtn");
 
         populateWordSetsBtn.addEventListener("click", () => {
-            const hardCodedString = "accommodation conclusion explanation
-actually conscience February
-alcohol conscious fierce
-although consequence forty
-analyse/analysis continuous fulfil
-argument creation furthermore
-assessment daughter guard
-atmosphere decide/decision happened
-audible definite health
-audience design height
-autumn development imaginary
-beautiful diamond improvise
-beginning diary industrial
-believe disappear interesting
-beneath disappoint interrupt
-buried embarrass issue
-business energy jealous
-caught engagement knowledge
-chocolate enquire listening
-climb environment lonely
-column evaluation lovely
-concentration evidence marriage
-material potential sincerely"; // Replace with actual words
+            const hardCodedString = "word1 word2 word3 word4 word5 word6 word7 word8 word9"; // Replace with actual words
             const words = hardCodedString.split(' ');
 
             const wordSets = JSON.parse(localStorage.getItem("wordSets")) || {};
@@ -88,7 +78,7 @@ material potential sincerely"; // Replace with actual words
             // Save the word sets back to localStorage
             localStorage.setItem("wordSets", JSON.stringify(wordSets));
 
-            alert("Corfu word sets have been populated.");
+            alert("Corfu word sets have been successfully populated.");
         });
     </script>
 </body>
