@@ -76,13 +76,13 @@
             // Create word sets in batches of 10
             for (let i = 0; i < words.length; i += 10) {
                 const batch = words.slice(i, i + 10);
-                wordSets[`Corfu Batch ${Math.floor(i / 10) + 1}`] = batch;
+                wordSets[`Diagnostic Batch ${Math.floor(i / 10) + 1}`] = batch;
             }
 
             // Save the word sets back to localStorage
             localStorage.setItem("wordSets", JSON.stringify(wordSets));
 
-            alert("Corfu word sets have been successfully populated.");
+            alert("Diagnostic word sets have been successfully populated.");
         });
     </script>
 </body>
