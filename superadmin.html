@@ -19,35 +19,41 @@
             font-size: 16px;
             margin-top: 20px;
             cursor: pointer;
-            background-color: red;
-            color: white;
             border: none;
         }
-        button:hover {
+        #deleteAllBtn {
+            background-color: red;
+            color: white;
+        }
+        #deleteAllBtn:hover {
             background-color: darkred;
         }
         #populateWordSetsBtn {
             background-color: blue;
             color: white;
-            padding: 10px 20px;
-            font-size: 16px;
-            margin-top: 20px;
-            cursor: pointer;
-            border: none;
         }
         #populateWordSetsBtn:hover {
             background-color: darkblue;
+        }
+        /* Styles for normal buttons */
+        #backBtn, #adminBtn {
+            background-color: lightgray;
+            color: black;
+        }
+        #backBtn:hover, #adminBtn:hover {
+            background-color: gray;
         }
     </style>
 </head>
 <body>
     <h1>Superadmin - Manage Word Sets</h1>
     <p>Use this page to delete all word sets stored in the application.</p>
-    <button id="deleteAllBtn">Delete All Word Sets</button>
-    <button onclick="location.href='index.html'">Back to Test</button>
-    <button onclick="location.href='admin.html'">Admin Page</button>
+   
+    <button id="backBtn" onclick="location.href='index.html'">Back to Test</button>
+    <button id="adminBtn" onclick="location.href='admin.html'">Admin Page</button>
     <button id="populateWordSetsBtn">Populate Corfu Word Sets</button>
-
+    <button id="deleteAllBtn">Delete All Word Sets</button>
+    
     <script>
         const deleteAllBtn = document.getElementById("deleteAllBtn");
 
