@@ -119,18 +119,12 @@
             let isDynamicSet = false;
 
             function getWordSets() {
-                const wordSets = JSON.parse(localStorage.getItem("wordSets")) || {};
-
-                // Initialize "Dynamic List" if it doesn't exist
-                if (!wordSets["Dynamic List"]) {
-                    wordSets["Dynamic List"] = [];
-                    saveWordSets(wordSets);
-                }
-                return wordSets;
+                return JSON.parse(localStorage.getItem("wordSets")) || {};
             }
 
             function saveWordSets(wordSets) {
                 localStorage.setItem("wordSets", JSON.stringify(wordSets));
+                console.log("Saved word sets:", wordSets);
             }
 
             function speakWord(word) {
@@ -172,36 +166,41 @@
                 speakWord(currentWords[currentIndex]);
             }
 
-            function getLearningWords(setName) {
+            function getLearningWords() {
                 const learningWords = JSON.parse(localStorage.getItem("learningWords")) || {};
-                if (!learningWords[setName]) {
-                    learningWords[setName] = [];
-                    saveLearningWords(learningWords);
-                }
-                return learningWords[setName];
+                console.log("Retrieved learning words:", learningWords);
+                return learningWords;
             }
 
             function saveLearningWords(learningWords) {
                 localStorage.setItem("learningWords", JSON.stringify(learningWords));
+                console.log("Saved learning words:", learningWords);
             }
 
-            function addWordToLearningList(setName, word) {
-                const learningWords = JSON.parse(localStorage.getItem("learningWords")) || {};
-                if (!learningWords[setName]) {
-                    learningWords[setName] = [];
+            function addWordToLearningList(word) {
+                const wordSets = getWordSets();
+                const learningListName = "Learning Words";
+
+                if (!wordSets[learningListName]) {
+                    wordSets[learningListName] = [];
+                    console.log(`Created new learning words list: ${learningListName}`);
                 }
-                if (!learningWords[setName].includes(word)) {
-                    if (learningWords[setName].length >= 10) {
-                        learningWords[setName].shift(); // Remove the oldest word if the list exceeds 10
+
+                if (!wordSets[learningListName].includes(word)) {
+                    if (wordSets[learningListName].length >= 10) {
+                        wordSets[learningListName].shift(); // Remove the oldest word if the list exceeds 10
                     }
-                    learningWords[setName].push(word);
-                    saveLearningWords(learningWords);
+                    wordSets[learningListName].push(word);
+                    console.log(`Added word "${word}" to ${learningListName}`);
+                    saveWordSets(wordSets);
+                } else {
+                    console.log(`Word "${word}" already exists in ${learningListName}`);
                 }
             }
 
             function checkWord() {
-                const userInput = wordInput.value.trim().toLowerCase(); // Convert user input to lowercase
-                const currentWord = currentWords[currentIndex].toLowerCase(); // Convert current word to lowercase
+                const userInput = wordInput.value.trim().toLowerCase();
+                const currentWord = currentWords[currentIndex].toLowerCase();
                 if (userInput === currentWord) {
                     result.textContent = "Correct!";
                     result.style.color = "green";
@@ -238,8 +237,8 @@
                     wordSets["Dynamic List"].push(currentWords[currentIndex]);
                     saveWordSets(wordSets);
 
-                    // Add to Learning Word list
-                    addWordToLearningList(document.getElementById("testName").textContent, currentWords[currentIndex]);
+                    // Add to global Learning Word list
+                    addWordToLearningList(currentWords[currentIndex]);
 
                     showHint();
                     wordChecked = false;
