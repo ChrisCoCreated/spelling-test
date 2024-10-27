@@ -167,49 +167,79 @@
                 speakWord(currentWords[currentIndex]);
             }
 
-function checkWord() {
-    const userInput = wordInput.value.trim().toLowerCase(); // Convert user input to lowercase
-    const currentWord = currentWords[currentIndex].toLowerCase(); // Convert current word to lowercase
-    if (userInput === currentWord) {
-        result.textContent = "Correct!";
-        result.style.color = "green";
-        hint.textContent = "";
-        if (!revisitWords.includes(currentWords[currentIndex])) {
-            correctWords.push(currentWords[currentIndex]);
-            correctFirstAttempt++;
-            scoreCount.textContent = correctFirstAttempt;
-        }
-
-        if (isDynamicSet) {
-            const dynamicList = getWordSets()["Dynamic List"];
-            const index = dynamicList.indexOf(currentWords[currentIndex]);
-            if (index !== -1) {
-                dynamicList.splice(index, 1);
-                const wordSets = getWordSets();
-                wordSets["Dynamic List"] = dynamicList;
-                saveWordSets(wordSets);
+            function getLearningWords(setName) {
+                const learningWords = JSON.parse(localStorage.getItem("learningWords")) || {};
+                if (!learningWords[setName]) {
+                    learningWords[setName] = [];
+                    saveLearningWords(learningWords);
+                }
+                return learningWords[setName];
             }
-        }
 
-        nextBtn.style.display = "inline-block";
-        submitBtn.style.display = "none";
-        replayBtn.style.display = "none";
-        wordChecked = true;
-    } else {
-        result.textContent = "Incorrect. Try again.";
-        result.style.color = "red";
-        if (!revisitWords.includes(currentWords[currentIndex])) {
-            revisitWords.push(currentWords[currentIndex]);
-        }
+            function saveLearningWords(learningWords) {
+                localStorage.setItem("learningWords", JSON.stringify(learningWords));
+            }
 
-        const wordSets = getWordSets();
-        wordSets["Dynamic List"].push(currentWords[currentIndex]);
-        saveWordSets(wordSets);
+            function addWordToLearningList(setName, word) {
+                const learningWords = JSON.parse(localStorage.getItem("learningWords")) || {};
+                if (!learningWords[setName]) {
+                    learningWords[setName] = [];
+                }
+                if (!learningWords[setName].includes(word)) {
+                    if (learningWords[setName].length >= 10) {
+                        learningWords[setName].shift(); // Remove the oldest word if the list exceeds 10
+                    }
+                    learningWords[setName].push(word);
+                    saveLearningWords(learningWords);
+                }
+            }
 
-        showHint();
-        wordChecked = false;
-    }
-}
+            function checkWord() {
+                const userInput = wordInput.value.trim().toLowerCase(); // Convert user input to lowercase
+                const currentWord = currentWords[currentIndex].toLowerCase(); // Convert current word to lowercase
+                if (userInput === currentWord) {
+                    result.textContent = "Correct!";
+                    result.style.color = "green";
+                    hint.textContent = "";
+                    if (!revisitWords.includes(currentWords[currentIndex])) {
+                        correctWords.push(currentWords[currentIndex]);
+                        correctFirstAttempt++;
+                        scoreCount.textContent = correctFirstAttempt;
+                    }
+
+                    if (isDynamicSet) {
+                        const dynamicList = getWordSets()["Dynamic List"];
+                        const index = dynamicList.indexOf(currentWords[currentIndex]);
+                        if (index !== -1) {
+                            dynamicList.splice(index, 1);
+                            const wordSets = getWordSets();
+                            wordSets["Dynamic List"] = dynamicList;
+                            saveWordSets(wordSets);
+                        }
+                    }
+
+                    nextBtn.style.display = "inline-block";
+                    submitBtn.style.display = "none";
+                    replayBtn.style.display = "none";
+                    wordChecked = true;
+                } else {
+                    result.textContent = "Incorrect. Try again.";
+                    result.style.color = "red";
+                    if (!revisitWords.includes(currentWords[currentIndex])) {
+                        revisitWords.push(currentWords[currentIndex]);
+                    }
+
+                    const wordSets = getWordSets();
+                    wordSets["Dynamic List"].push(currentWords[currentIndex]);
+                    saveWordSets(wordSets);
+
+                    // Add to Learning Word list
+                    addWordToLearningList(document.getElementById("testName").textContent, currentWords[currentIndex]);
+
+                    showHint();
+                    wordChecked = false;
+                }
+            }
 
             function showHint() {
                 hintIndex = Math.min(hintIndex + 1, currentWords[currentIndex].length);
