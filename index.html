@@ -245,7 +245,9 @@
                         correctFirstAttempt++;
                         scoreCount.textContent = correctFirstAttempt;
                     }
-                    removeFromDynamicList();
+                    if (hintIndex === 0) {
+                        removeFromDynamicList();
+                    }
                     // Always attempt to remove from Dynamic List if correct
                     function removeFromDynamicList() {
                         const wordSets = getWordSets();
@@ -261,13 +263,12 @@
                             console.log(`Word "${currentWords[currentIndex]}" not found in Dynamic List.`);
                         }
                         console.log(`Dynamic List after removal: ${dynamicList}`);
-                    
+                    }
 
                     nextBtn.style.display = "inline-block";
                     submitBtn.style.display = "none";
                     replayBtn.style.display = "none";
                     wordChecked = true;
-                    }
                 } else {
                     console.log("Word is incorrect.");
                     result.textContent = "Incorrect. Try again.";
@@ -283,9 +284,12 @@
                         wordSets["Dynamic List"] = [];
                     }
                     
+                    // Add the word to the Dynamic List after the first incorrect attempt
+                   
                     wordSets["Dynamic List"].push(currentWords[currentIndex]);
                     saveWordSets(wordSets);
                     console.log(`Added "${currentWords[currentIndex]}" to Dynamic List.`);
+                   
 
                     // Add to global Learning Word list
                     addWordToLearningList(currentWords[currentIndex]);
