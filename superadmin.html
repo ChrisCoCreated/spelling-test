@@ -73,13 +73,11 @@
 
             const wordSets = JSON.parse(localStorage.getItem("wordSets")) || {};
 
-            // Calculate the size of each third
-            const thirdSize = Math.ceil(words.length / 3);
-
-            // Assign words to the word sets
-            wordSets["Corfu A"] = words.slice(0, thirdSize);
-            wordSets["Corfu B"] = words.slice(thirdSize, 2 * thirdSize);
-            wordSets["Corfu C"] = words.slice(2 * thirdSize);
+            // Create word sets in batches of 10
+            for (let i = 0; i < words.length; i += 10) {
+                const batch = words.slice(i, i + 10);
+                wordSets[`Corfu Batch ${Math.floor(i / 10) + 1}`] = batch;
+            }
 
             // Save the word sets back to localStorage
             localStorage.setItem("wordSets", JSON.stringify(wordSets));
