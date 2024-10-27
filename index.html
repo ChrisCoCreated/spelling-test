@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spelling Test</title>
+    <title>Spelling Success</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -56,7 +56,7 @@
     </style>
 </head>
 <body>
-    <h1>Spelling Test</h1>
+    <h1>Spelling Success</h1>
     <i id="testName"></i>
     <div id="wordSetSelection">
         <p>Choose a set of words:</p>
@@ -79,17 +79,16 @@
         <p id="score">Correct on first attempt: <span id="scoreCount">0</span></p>
     </div>
     <div id="summary">
-        <h2>Test Summary</h2>
+        <h2>Diagnostic Summary</h2>
         <p><strong>Correct Words (First Attempt):</strong></p>
         <ul id="correctList"></ul>
         <p><strong>Words to Revisit:</strong></p>
         <ul id="revisitList"></ul>
         <p><strong>Total Correct on First Attempt:</strong> <span id="firstAttemptCount"></span></p>
-        <button id="restartBtn">Restart with Original Words</button>
-        <button id="revisitBtn" style="display: none;">New Test with Revisit Words</button>
+        <button id="backToListsBtn">Back to Word Lists</button>
     </div>
     <a href="admin.html" id="adminLink">Admin Page</a>
-    <div id="version">Version 1.0.2</div>
+    <div id="version">Version 1.0.3</div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -105,8 +104,7 @@
             const revisitList = document.getElementById("revisitList");
             const firstAttemptCount = document.getElementById("firstAttemptCount");
             const scoreCount = document.getElementById("scoreCount");
-            const restartBtn = document.getElementById("restartBtn");
-            const revisitBtn = document.getElementById("revisitBtn");
+            const backToListsBtn = document.getElementById("backToListsBtn");
 
             let currentWords = [];
             let originalWords = [];
@@ -290,7 +288,7 @@
                 });
 
                 firstAttemptCount.textContent = correctFirstAttempt;
-                revisitBtn.style.display = revisitWords.length
+                backToListsBtn.style.display = revisitWords.length
                 > 0 ? "inline-block" : "none";
             }
 
@@ -334,8 +332,11 @@
 
             nextBtn.addEventListener("click", nextWord);
             replayBtn.addEventListener("click", replayWord);
-            restartBtn.addEventListener("click", () => resetTest(false));
-            revisitBtn.addEventListener("click", () => resetTest(true));
+            backToListsBtn.addEventListener("click", () => {
+                document.getElementById("testContainer").style.display = "none";
+                summary.style.display = "none";
+                wordSetSelection.style.display = "block";
+            });
 
             // Initialize the page by rendering word set buttons
             renderWordSetButtons();
