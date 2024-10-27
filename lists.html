@@ -54,16 +54,30 @@
             const dynamicListContainer = document.getElementById("dynamicList");
             const learningListsContainer = document.getElementById("learningLists");
 
-            // Render Dynamic List
-            dynamicListContainer.innerHTML = dynamicList.map(word => `<li>${word}</li>`).join("");
+            // Helper function to count occurrences
+            function countOccurrences(arr) {
+                return arr.reduce((acc, word) => {
+                    acc[word] = (acc[word] || 0) + 1;
+                    return acc;
+                }, {});
+            }
 
-            // Render Learning Lists
+            // Render Dynamic List with multipliers
+            const dynamicWordCounts = countOccurrences(dynamicList);
+            dynamicListContainer.innerHTML = Object.entries(dynamicWordCounts)
+                .map(([word, count]) => `<li>${word}${count > 1 ? ` (x${count})` : ''}</li>`)
+                .join("");
+
+            // Render Learning Lists with multipliers
             learningListsContainer.innerHTML = "";
             for (const setName in wordSets) {
                 if (setName.toLowerCase().includes("learning")) {
                     const list = wordSets[setName];
+                    const wordCounts = countOccurrences(list);
                     const listElement = document.createElement("li");
-                    listElement.innerHTML = `<strong>${setName}:</strong> ${list.join(", ")}`;
+                    listElement.innerHTML = `<strong>${setName}:</strong> ${Object.entries(wordCounts)
+                        .map(([word, count]) => `${word}${count > 1 ? ` (x${count})` : ''}`)
+                        .join(", ")}`;
                     learningListsContainer.appendChild(listElement);
                 }
             }
