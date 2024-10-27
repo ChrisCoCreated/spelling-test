@@ -26,7 +26,10 @@
             width: 200px;
             margin-right: 10px;
         }
-
+        button.delete {
+            background-color: red;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -43,16 +46,16 @@
     <h3>Edit or Delete Selected Word</h3>
     <input type="text" id="editWordInput" placeholder="Edit selected word" />
     <button id="saveEditBtn">Save Edit</button>
-    <button id="deleteWordBtn">Delete Word</button>
+    <button id="deleteWordBtn" class="delete">Delete Word</button>
 
     <h3>Add New Set</h3>
     <input type="text" id="newSetInput" placeholder="Enter new set name" />
     <button id="addSetBtn">Add Set</button>
 
     <h3>Delete Selected Set</h3>
-    <button id="deleteSetBtn">Delete Selected Set</button>
-
-    <button onclick="location.href='index.html'">Back to Test</button>
+    <button id="deleteSetBtn" class="delete">Delete Selected Set</button>
+    <br><br>
+    <button onclick="location.href='index.html'">Back to Word Lists</button>
 <br><br>
     <a href="superadmin.html" id="superadminLink">Superadmin Page</a>
 
@@ -196,10 +199,12 @@
         });
 
         deleteSetBtn.addEventListener("click", () => {
-            if (selectedSet && selectedSet !== "Dynamic List" && confirm(`Are you sure you want to delete the set "${selectedSet}"?`)) {
-                delete wordSets[selectedSet];
-                saveWordSets(wordSets);
-                renderWordSets();
+            if (selectedSet && selectedSet !== "Dynamic List") {
+                if (confirm(`Are you sure you want to delete the set "${selectedSet}"?`)) {
+                    delete wordSets[selectedSet];
+                    saveWordSets(wordSets);
+                    renderWordSets();
+                }
             } else if (selectedSet === "Dynamic List") {
                 alert("The Dynamic List cannot be deleted.");
             }
