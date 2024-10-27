@@ -53,6 +53,11 @@
             color: grey;
             font-size: 12px;
         }
+        #languageSelection {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+        }
     </style>
 </head>
 <body>
@@ -89,6 +94,11 @@
     </div>
     <a href="admin.html" id="adminLink">Admin Page</a>
     <div id="version">Version 1.0.3</div>
+    <div id="languageSelection">
+        <button class="languageBtn" data-lang="en-US">English</button>
+        <button class="languageBtn" data-lang="es-ES">Spanish</button>
+        <button class="languageBtn" data-lang="fr-FR">French</button>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -115,6 +125,7 @@
             let revisitWords = [];
             let correctFirstAttempt = 0;
             let isDynamicSet = false;
+            let currentLanguage = "en-US"; // Default language
 
             function getWordSets() {
                 return JSON.parse(localStorage.getItem("wordSets")) || {};
@@ -130,7 +141,18 @@
 
             function speakWord(word) {
                 const speech = new SpeechSynthesisUtterance(word);
-                speech.lang = "en-US";
+                speech.lang = currentLanguage;
+
+                // Check if the desired language voice is available
+                const voices = window.speechSynthesis.getVoices();
+                const voice = voices.find(v => v.lang === currentLanguage);
+
+                if (voice) {
+                    speech.voice = voice;
+                } else {
+                    console.warn(`Voice for language ${currentLanguage} not found. Using default voice.`);
+                }
+
                 window.speechSynthesis.speak(speech);
             }
 
@@ -208,33 +230,45 @@
             function checkWord() {
                 const userInput = wordInput.value.trim().toLowerCase();
                 const currentWord = currentWords[currentIndex].toLowerCase();
+                console.log(`Checking word: ${currentWord}, User input: ${userInput}`);
+
                 if (userInput === currentWord) {
+                    console.log("Word is correct.");
                     result.textContent = "Correct!";
                     result.style.color = "green";
                     hint.textContent = "";
+
+                    // Update correct words and score if not in revisitWords
                     if (!revisitWords.includes(currentWords[currentIndex])) {
                         correctWords.push(currentWords[currentIndex]);
                         correctFirstAttempt++;
                         scoreCount.textContent = correctFirstAttempt;
-
-                        // Remove from Dynamic List if correct on first attempt
-                        if (isDynamicSet) {
-                            const dynamicList = getWordSets()["Dynamic List"];
-                            const index = dynamicList.indexOf(currentWords[currentIndex]);
-                            if (index !== -1) {
-                                dynamicList.splice(index, 1);
-                                const wordSets = getWordSets();
-                                wordSets["Dynamic List"] = dynamicList;
-                                saveWordSets(wordSets);
-                            }
-                        }
                     }
+                    removeFromDynamicList();
+                    // Always attempt to remove from Dynamic List if correct
+                    function removeFromDynamicList() {
+                        const wordSets = getWordSets();
+                        const dynamicList = wordSets["Dynamic List"];
+                        const index = dynamicList.indexOf(currentWords[currentIndex]);
+                        console.log(`Dynamic List before removal: ${dynamicList}`);
+                        if (index !== -1) {
+                            dynamicList.splice(index, 1);
+                            wordSets["Dynamic List"] = dynamicList;
+                            saveWordSets(wordSets);
+                            console.log(`Removed "${currentWords[currentIndex]}" from Dynamic List.`);
+                        } else {
+                            console.log(`Word "${currentWords[currentIndex]}" not found in Dynamic List.`);
+                        }
+                        console.log(`Dynamic List after removal: ${dynamicList}`);
+                    
 
                     nextBtn.style.display = "inline-block";
                     submitBtn.style.display = "none";
                     replayBtn.style.display = "none";
                     wordChecked = true;
+                    }
                 } else {
+                    console.log("Word is incorrect.");
                     result.textContent = "Incorrect. Try again.";
                     result.style.color = "red";
                     if (!revisitWords.includes(currentWords[currentIndex])) {
@@ -250,6 +284,7 @@
                     
                     wordSets["Dynamic List"].push(currentWords[currentIndex]);
                     saveWordSets(wordSets);
+                    console.log(`Added "${currentWords[currentIndex]}" to Dynamic List.`);
 
                     // Add to global Learning Word list
                     addWordToLearningList(currentWords[currentIndex]);
@@ -370,6 +405,18 @@
 
             // Initialize the page by rendering word set buttons
             renderWordSetButtons();
+
+            // Load voices asynchronously
+            window.speechSynthesis.onvoiceschanged = () => {
+                console.log("Available voices:", window.speechSynthesis.getVoices());
+            };
+
+            document.querySelectorAll('.languageBtn').forEach(button => {
+                button.addEventListener('click', () => {
+                    currentLanguage = button.dataset.lang;
+                    console.log(`Language changed to: ${currentLanguage}`);
+                });
+            });
         });
     </script>
 </body>

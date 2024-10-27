@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>French Speech Test</title>
+</head>
+<body>
+    <h1>French Speech Synthesis Test</h1>
+    <button id="speakFrench">Speak French</button>
+
+    <script>
+        document.getElementById('speakFrench').addEventListener('click', () => {
+            const utterance = new SpeechSynthesisUtterance('Bonjour');
+            utterance.lang = 'fr-FR';
+
+            // Load voices and find a French voice
+            const voices = window.speechSynthesis.getVoices();
+            const frenchVoice = voices.find(voice => voice.lang === 'fr-FR');
+
+            if (frenchVoice) {
+                utterance.voice = frenchVoice;
+            } else {
+                console.warn('French voice not found. Using default voice.');
+            }
+
+            window.speechSynthesis.speak(utterance);
+        });
+
+        // Log available voices
+        window.speechSynthesis.onvoiceschanged = () => {
+            const voices = window.speechSynthesis.getVoices();
+            console.log("Available voices:", voices);
+            voices.forEach(voice => {
+                console.log(`Voice: ${voice.name}, Language: ${voice.lang}`);
+            });
+        };
+    </script>
+</body>
+</html>

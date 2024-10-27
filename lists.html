@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic and Learning Lists</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .list-container {
+            margin-bottom: 30px;
+            width: 80%;
+            max-width: 600px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dynamic and Learning Lists</h1>
+    <div class="list-container" id="dynamicListContainer">
+        <h2>Dynamic List</h2>
+        <ul id="dynamicList"></ul>
+    </div>
+    <div class="list-container" id="learningListsContainer">
+        <h2>Learning Lists</h2>
+        <ul id="learningLists"></ul>
+    </div>
+
+    <script>
+        function getWordSets() {
+            return JSON.parse(localStorage.getItem("wordSets")) || {};
+        }
+
+        function renderLists() {
+            const wordSets = getWordSets();
+            const dynamicList = wordSets["Dynamic List"] || [];
+            const dynamicListContainer = document.getElementById("dynamicList");
+            const learningListsContainer = document.getElementById("learningLists");
+
+            // Render Dynamic List
+            dynamicListContainer.innerHTML = dynamicList.map(word => `<li>${word}</li>`).join("");
+
+            // Render Learning Lists
+            learningListsContainer.innerHTML = "";
+            for (const setName in wordSets) {
+                if (setName.toLowerCase().includes("learning")) {
+                    const list = wordSets[setName];
+                    const listElement = document.createElement("li");
+                    listElement.innerHTML = `<strong>${setName}:</strong> ${list.join(", ")}`;
+                    learningListsContainer.appendChild(listElement);
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", renderLists);
+    </script>
+</body>
+</html>
