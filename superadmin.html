@@ -34,6 +34,7 @@
     <button id="deleteAllBtn">Delete All Word Sets</button>
     <button onclick="location.href='index.html'">Back to Test</button>
     <button onclick="location.href='admin.html'">Admin Page</button>
+    <button id="populateWordSetsBtn">Populate Corfu Word Sets</button>
 
     <script>
         const deleteAllBtn = document.getElementById("deleteAllBtn");
@@ -44,6 +45,50 @@
                 alert("All word sets have been deleted.");
                 location.reload(); // Reload the page to update the UI
             }
+        });
+
+        const populateWordSetsBtn = document.getElementById("populateWordSetsBtn");
+
+        populateWordSetsBtn.addEventListener("click", () => {
+            const hardCodedString = "accommodation conclusion explanation
+actually conscience February
+alcohol conscious fierce
+although consequence forty
+analyse/analysis continuous fulfil
+argument creation furthermore
+assessment daughter guard
+atmosphere decide/decision happened
+audible definite health
+audience design height
+autumn development imaginary
+beautiful diamond improvise
+beginning diary industrial
+believe disappear interesting
+beneath disappoint interrupt
+buried embarrass issue
+business energy jealous
+caught engagement knowledge
+chocolate enquire listening
+climb environment lonely
+column evaluation lovely
+concentration evidence marriage
+material potential sincerely"; // Replace with actual words
+            const words = hardCodedString.split(' ');
+
+            const wordSets = JSON.parse(localStorage.getItem("wordSets")) || {};
+
+            // Calculate the size of each third
+            const thirdSize = Math.ceil(words.length / 3);
+
+            // Assign words to the word sets
+            wordSets["Corfu A"] = words.slice(0, thirdSize);
+            wordSets["Corfu B"] = words.slice(thirdSize, 2 * thirdSize);
+            wordSets["Corfu C"] = words.slice(2 * thirdSize);
+
+            // Save the word sets back to localStorage
+            localStorage.setItem("wordSets", JSON.stringify(wordSets));
+
+            alert("Corfu word sets have been populated.");
         });
     </script>
 </body>
