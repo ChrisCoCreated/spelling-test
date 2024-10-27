@@ -336,6 +336,20 @@
                 document.getElementById("testContainer").style.display = "none";
                 summary.style.display = "none";
                 wordSetSelection.style.display = "block";
+                
+                // Reset the test section
+                wordInput.value = ""; // Clear the input field
+                result.textContent = ""; // Clear the result message
+                hint.textContent = ""; // Clear the hint
+                wordChecked = false; // Reset the word checked state
+                currentIndex = 0; // Reset the current index
+                correctWords.length = 0; // Clear the correct words list
+                revisitWords.length = 0; // Clear the revisit words list
+                correctFirstAttempt = 0; // Reset the correct first attempt count
+                scoreCount.textContent = correctFirstAttempt; // Update the score display
+                nextBtn.style.display = "none"; // Hide the next button
+                submitBtn.style.display = "inline-block"; // Show the submit button
+                replayBtn.style.display = "inline-block"; // Show the replay button
             });
 
             // Initialize the page by rendering word set buttons
