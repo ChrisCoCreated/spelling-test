@@ -177,7 +177,10 @@
                 currentWords = wordSets[setName] || [];
                 originalWords = [...currentWords];
                 isDynamicSet = setName === "Dynamic List";
-		    document.getElementById("testName").textContent = `${setName}`;
+		        document.getElementById("testName").textContent = `${setName}`;
+        
+                currentWords = currentWords.sort(() => Math.random() - 0.5);
+    
                 startTest();
             }
 
