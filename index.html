@@ -136,7 +136,7 @@
                 localStorage.setItem("wordSets", JSON.stringify(wordSets));
                 
                 // Log all word sets with "learning" in their names
-                const learningWordSets = Object.keys(wordSets).filter(setName => setName.toLowerCase().includes("learning"));
+                const learningWordSets = Object.keys(wordSets).filter(setName => setName.toLowerCase().includes("learning words"));
                 console.log("Learning word sets:", learningWordSets);
             }
 
@@ -288,14 +288,14 @@
                     }
                     
                     // Add the word to the Dynamic List after the first incorrect attempt
-                   
                     wordSets["Dynamic List"].push(currentWords[currentIndex]);
                     saveWordSets(wordSets);
                     console.log(`Added "${currentWords[currentIndex]}" to Dynamic List.`);
-                   
-
-                    // Add to global Learning Word list
-                    addWordToLearningList(currentWords[currentIndex]);
+                    
+                    // Add to global Learning Word list only if not using a learning list
+                    if (!setName.toLowerCase().includes("learning words")) {
+                        addWordToLearningList(currentWords[currentIndex]);
+                    }
 
                     showHint();
                     wordChecked = false;
