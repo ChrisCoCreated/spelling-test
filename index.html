@@ -127,6 +127,7 @@
             let correctFirstAttempt = 0;
             let isDynamicSet = false;
             let currentLanguage = "en-GB"; // Default language
+            let currentSetName = "";
 
             function getWordSets() {
                 return JSON.parse(localStorage.getItem("wordSets")) || {};
@@ -177,6 +178,7 @@
                 currentWords = wordSets[setName] || [];
                 originalWords = [...currentWords];
                 isDynamicSet = setName === "Dynamic List";
+                currentSetName = setName;
 		        document.getElementById("testName").textContent = `${setName}`;
         
                 currentWords = currentWords.sort(() => Math.random() - 0.5);
@@ -293,7 +295,7 @@
                     console.log(`Added "${currentWords[currentIndex]}" to Dynamic List.`);
                     
                     // Add to global Learning Word list only if not using a learning list
-                    if (!setName.toLowerCase().includes("learning words")) {
+                    if (!currentSetName.toLowerCase().includes("learning words")) {
                         addWordToLearningList(currentWords[currentIndex]);
                     }
 
